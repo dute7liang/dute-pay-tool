@@ -1,8 +1,8 @@
 package com.dute7liang.pay.tool.vx.bean;
 
-import com.dute7liang.pay.tool.vx.config.WxPayConfig;
 import com.dute7liang.pay.tool.common.bean.Trade;
 import com.dute7liang.pay.tool.common.util.PayMD5;
+import com.dute7liang.pay.tool.vx.config.WxPayConfig;
 
 import java.util.UUID;
 

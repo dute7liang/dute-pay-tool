@@ -35,7 +35,7 @@ public abstract class AbstractWx {
      * @return 签名
      */
     protected String signMD5(Map<String,String> params){
-        List<String> pairs = new ArrayList<String>();
+        List<String> pairs = new ArrayList<>();
         for(Map.Entry<String, String> entry : params.entrySet()){
             if(StringUtils.isBlank(entry.getValue())){
                 continue;
