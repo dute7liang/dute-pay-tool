@@ -99,12 +99,7 @@ public abstract class WxBaseTrade implements Serializable {
      * @return the string
      */
     public String toXML() {
-        if (XmlConfig.fastMode) {
-            return toFastXml();
-        }
-        XStream xstream = XStreamInitializer.getInstance();
-        xstream.processAnnotations(this.getClass());
-        return xstream.toXML(this);
+        return toFastXml();
     }
 
     /**

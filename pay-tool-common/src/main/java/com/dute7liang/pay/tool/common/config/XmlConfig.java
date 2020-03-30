@@ -18,6 +18,6 @@ public class XmlConfig {
    * 参考测试案例: com.github.binarywang.wxpay.bean.result.WxPayRedpackQueryResultTest#benchmark
    * 参考网址: https://www.graalvm.org/
    */
-  public static boolean fastMode = false;
+  public static boolean fastMode = true;
 
 }

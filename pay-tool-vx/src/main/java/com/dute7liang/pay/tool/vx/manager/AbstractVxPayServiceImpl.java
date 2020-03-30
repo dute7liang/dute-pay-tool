@@ -28,12 +28,15 @@ import java.util.Map;
 @Slf4j
 public class AbstractVxPayServiceImpl implements WxPayServiceI {
 
-    @Getter
     @Setter
     protected WxPayConfigTest wxPayConfig;
 
+    @Override
+    public WxPayConfigTest getConfig() {
+        return wxPayConfig;
+    }
 
-    public <T> TradeToken<T> mobilePay(WxTradeTest trade) throws DocumentException {
+    public <T> TradeToken<T> mobilePay(WxTradeTest trade) {
         trade.checkAndSign(wxPayConfig);
 
         SimpleResponse response = HttpClient.getClient().post(WxPayConfig.getUnifiedorderURL(), trade.toXML());
@@ -48,7 +51,9 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
          * 解析响应数据
          */
         WxPayUnifiedOrderResult result = BaseWxPayResult.fromXML(responseBody, WxPayUnifiedOrderResult.class);
+        result.checkResult(this, trade.getSignType(), true);
         String prepayId = result.getPrepayId();
+
 
         Map<String, String> params = new HashMap<>();
         params.put("appid", trade.getAppid());
@@ -57,8 +62,8 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
         params.put("package", "Sign=WXPay");
         params.put("noncestr",  trade.getNonceStr());
         params.put("timestamp",  String.valueOf(System.currentTimeMillis()/1000));
-        params.put("sign",  signMD5(params));
-        return () -> params;
+//        params.put("sign",  signMD5(params));
+        return null;
     }
 
 
@@ -105,4 +110,6 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
     public TradeStatus status(WxTrade trade) {
         return wxMobilePay.status(trade);
     }
+
+
 }
