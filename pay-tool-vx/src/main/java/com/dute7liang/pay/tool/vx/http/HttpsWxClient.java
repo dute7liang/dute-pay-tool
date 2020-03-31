@@ -2,6 +2,8 @@ package com.dute7liang.pay.tool.vx.http;
 
 import com.dute7liang.pay.tool.common.http.client.common.AbstractSSLHttpClient;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContexts;
@@ -21,7 +23,11 @@ import java.security.KeyStore;
 public class HttpsWxClient extends AbstractSSLHttpClient {
     
     private static final HttpsWxClient CLIENT = new HttpsWxClient();
-    
+
+    @Getter
+    @Setter
+    private WxPayConfig config;
+
     private HttpsWxClient(){}
     
     @Override
@@ -33,14 +39,14 @@ public class HttpsWxClient extends AbstractSSLHttpClient {
              * 不同的第三方接口，需要使用不同的证书
              */
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            fis = new FileInputStream(new File(WxPayConfig.getCertPath()));
-            keyStore.load(fis, WxPayConfig.getCertPassword().toCharArray());
+            fis = new FileInputStream(new File(config.getCertPath()));
+            keyStore.load(fis, config.getCertPassword().toCharArray());
             
             /**
              * 构造SSL套接字工厂
              */
             SSLContext sslcontext = SSLContexts.custom()
-                    .loadKeyMaterial(keyStore, WxPayConfig.getCertPassword().toCharArray())
+                    .loadKeyMaterial(keyStore, config.getCertPassword().toCharArray())
                     .build();
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                     sslcontext,

@@ -1,13 +1,9 @@
-package com.dute7liang.pay.tool.vx.bean;
+package com.dute7liang.pay.tool.vx.core.trade;
 
-import com.dute7liang.pay.tool.common.config.XmlConfig;
 import com.dute7liang.pay.tool.common.util.PayMD5;
-import com.dute7liang.pay.tool.common.util.xml.XStreamInitializer;
-import com.dute7liang.pay.tool.vx.config.WxConstant;
-import com.dute7liang.pay.tool.vx.config.WxPayConfigTest;
+import com.dute7liang.pay.tool.vx.constant.WxConstant;
+import com.dute7liang.pay.tool.vx.config.WxPayConfig;
 import com.dute7liang.pay.tool.vx.util.SignUtils;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +35,6 @@ public abstract class WxBaseTrade implements Serializable {
      * 描述：微信分配的公众账号ID（企业号corpid即为此appId）
      * </pre>
      */
-    @XStreamAlias("appid")
     protected String appid;
     /**
      * <pre>
@@ -51,7 +46,6 @@ public abstract class WxBaseTrade implements Serializable {
      * 描述：微信支付分配的商户号
      * </pre>
      */
-    @XStreamAlias("mch_id")
     protected String mchId;
 
     /**
@@ -64,7 +58,6 @@ public abstract class WxBaseTrade implements Serializable {
      * 描述：签名，详见签名生成算法
      * </pre>
      */
-    @XStreamAlias("sign")
     protected String sign;
 
     /**
@@ -77,7 +70,6 @@ public abstract class WxBaseTrade implements Serializable {
      * 签名类型，目前支持HMAC-SHA256和MD5
      * </pre>
      */
-    @XStreamAlias("sign_type")
     private String signType;
 
     /**
@@ -90,7 +82,6 @@ public abstract class WxBaseTrade implements Serializable {
      * 描述：随机字符串，不长于32位。推荐随机数生成算法
      * </pre>
      */
-    @XStreamAlias("nonce_str")
     protected String nonceStr;
 
     /**
@@ -162,7 +153,7 @@ public abstract class WxBaseTrade implements Serializable {
     abstract protected void storeMap(Map<String, String> map);
 
 
-    public void checkAndSign(WxPayConfigTest config) {
+    public void checkAndSign(WxPayConfig config) {
         // 对一些必填参数给默认值
         if (StringUtils.isBlank(getAppid())) {
             this.setAppid(config.getAppid());
@@ -177,9 +168,13 @@ public abstract class WxBaseTrade implements Serializable {
             this.setNonceStr(PayMD5.encode(UUID.randomUUID().toString()));
         }
         // 检查参数的必填项
-        // this.checkFields();
+        this.checkFields();
         //设置签名字段的值
         this.setSign(SignUtils.createSign(this.getSignParams(), this.getSignType(), config.getMchKey(), this.getIgnoredParamsForSign()));
+    }
+
+    protected void checkFields(){
+
     }
 
 
@@ -191,4 +186,5 @@ public abstract class WxBaseTrade implements Serializable {
     protected String[] getIgnoredParamsForSign() {
         return new String[0];
     }
+
 }

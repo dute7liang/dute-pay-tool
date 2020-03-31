@@ -1,12 +1,8 @@
 package com.dute7liang.pay.tool.vx.core.result;
 
-import com.dute7liang.pay.tool.common.config.XmlConfig;
-import com.dute7liang.pay.tool.common.util.xml.XStreamInitializer;
-import com.dute7liang.pay.tool.vx.config.WxConstant;
-import com.dute7liang.pay.tool.vx.manager.WxPayServiceI;
+import com.dute7liang.pay.tool.vx.constant.WxConstant;
+import com.dute7liang.pay.tool.vx.service.WxPayServiceI;
 import com.dute7liang.pay.tool.vx.util.SignUtils;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,12 +32,10 @@ public abstract class BaseWxPayResult implements Serializable {
     /**
      * 返回状态码.
      */
-    @XStreamAlias("return_code")
     protected String returnCode;
     /**
      * 返回信息.
      */
-    @XStreamAlias("return_msg")
     protected String returnMsg;
 
     //当return_code为SUCCESS的时候，还会包括以下字段：
@@ -49,47 +43,30 @@ public abstract class BaseWxPayResult implements Serializable {
     /**
      * 业务结果.
      */
-    @XStreamAlias("result_code")
     private String resultCode;
     /**
      * 错误代码.
      */
-    @XStreamAlias("err_code")
     private String errCode;
     /**
      * 错误代码描述.
      */
-    @XStreamAlias("err_code_des")
     private String errCodeDes;
     /**
      * 公众账号ID.
      */
-    @XStreamAlias("appid")
     private String appid;
     /**
      * 商户号.
      */
-    @XStreamAlias("mch_id")
     private String mchId;
-    /**
-     * 服务商模式下的子公众账号ID.
-     */
-    @XStreamAlias("sub_appid")
-    private String subAppId;
-    /**
-     * 服务商模式下的子商户号.
-     */
-    @XStreamAlias("sub_mch_id")
-    private String subMchId;
     /**
      * 随机字符串.
      */
-    @XStreamAlias("nonce_str")
     private String nonceStr;
     /**
      * 签名.
      */
-    @XStreamAlias("sign")
     private String sign;
 
     //以下为辅助属性
@@ -155,8 +132,6 @@ public abstract class BaseWxPayResult implements Serializable {
         errCodeDes = readXMLString(d, "err_code_des");
         appid = readXMLString(d, "appid");
         mchId = readXMLString(d, "mch_id");
-        subAppId = readXMLString(d, "sub_appid");
-        subMchId = readXMLString(d, "sub_mch_id");
         nonceStr = readXMLString(d, "nonce_str");
         sign = readXMLString(d, "sign");
     }
@@ -245,6 +220,42 @@ public abstract class BaseWxPayResult implements Serializable {
     }
 
     /**
+     * 获取xml中元素的值.
+     *
+     * @param path the path
+     * @return the xml value
+     */
+    protected String getXmlValue(String... path) {
+        Document doc = this.getXmlDoc();
+        String expression = String.format("/%s//text()", StringUtils.join(path,"/"));
+        try {
+            return (String) XPathFactory
+                    .newInstance()
+                    .newXPath()
+                    .compile(expression)
+                    .evaluate(doc, XPathConstants.STRING);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException("未找到相应路径的文本：" + expression);
+        }
+    }
+
+    /**
+     * 获取xml中元素的值，作为int值返回.
+     *
+     * @param path the path
+     * @return the xml value as int
+     */
+    protected Integer getXmlValueAsInt(String... path) {
+        String result = this.getXmlValue(path);
+        if (StringUtils.isBlank(result)) {
+            return null;
+        }
+
+        return Integer.valueOf(result);
+    }
+
+
+    /**
      * 将xml字符串转换成Document对象，以便读取其元素值.
      */
     private Document getXmlDoc() {
@@ -267,46 +278,58 @@ public abstract class BaseWxPayResult implements Serializable {
     }
 
     /**
-     * 校验返回结果签名.
+     * 校验返回结果和签名
+     * @param wxPayService
+     * @param signType
+     */
+    public void checkResultAndSign(WxPayServiceI wxPayService, String signType){
+        checkResult();
+        checkSign(wxPayService,signType);
+    }
+
+    /**
+     * 校验返回结果
      *
-     * @param wxPayService the wx pay service
-     * @param signType     签名类型
-     * @param checkSuccess 是否同时检查结果是否成功
      * @throws RuntimeException the wx pay exception
      */
-    public void checkResult(WxPayServiceI wxPayService, String signType, boolean checkSuccess) throws RuntimeException {
+    public void checkResult() throws RuntimeException {
+        //校验结果是否成功
+        Map<String, String> map = toMap();
+        List<String> successStrings = Arrays.asList(WxConstant.ResultCode.SUCCESS, "");
+        if (!successStrings.contains(StringUtils.trimToEmpty(getReturnCode()).toUpperCase())
+                || !successStrings.contains(StringUtils.trimToEmpty(getResultCode()).toUpperCase())) {
+            StringBuilder errorMsg = new StringBuilder();
+            if (getReturnCode() != null) {
+                errorMsg.append("返回代码：").append(getReturnCode());
+            }
+            if (getReturnMsg() != null) {
+                errorMsg.append("，返回信息：").append(getReturnMsg());
+            }
+            if (getResultCode() != null) {
+                errorMsg.append("，结果代码：").append(getResultCode());
+            }
+            if (getErrCode() != null) {
+                errorMsg.append("，错误代码：").append(getErrCode());
+            }
+            if (getErrCodeDes() != null) {
+                errorMsg.append("，错误详情：").append(getErrCodeDes());
+            }
+            this.getLogger().error("\n结果业务代码异常，返回结果：{},\n{}", map, errorMsg.toString());
+            throw new RuntimeException(errorMsg.toString());
+        }
+    }
+
+    /**
+     * 校验签名的正确性
+     *
+     * @throws RuntimeException the wx pay exception
+     */
+    public void checkSign(WxPayServiceI wxPayService, String signType){
         //校验返回结果签名
         Map<String, String> map = toMap();
         if (getSign() != null && !SignUtils.checkSign(map, signType, wxPayService.getConfig().getMchKey())) {
             this.getLogger().debug("校验结果签名失败，参数：{}", map);
             throw new RuntimeException("参数格式校验错误！");
-        }
-
-        //校验结果是否成功
-        if (checkSuccess) {
-            List<String> successStrings = Arrays.asList(WxConstant.ResultCode.SUCCESS, "");
-            if (!successStrings.contains(StringUtils.trimToEmpty(getReturnCode()).toUpperCase())
-                    || !successStrings.contains(StringUtils.trimToEmpty(getResultCode()).toUpperCase())) {
-                StringBuilder errorMsg = new StringBuilder();
-                if (getReturnCode() != null) {
-                    errorMsg.append("返回代码：").append(getReturnCode());
-                }
-                if (getReturnMsg() != null) {
-                    errorMsg.append("，返回信息：").append(getReturnMsg());
-                }
-                if (getResultCode() != null) {
-                    errorMsg.append("，结果代码：").append(getResultCode());
-                }
-                if (getErrCode() != null) {
-                    errorMsg.append("，错误代码：").append(getErrCode());
-                }
-                if (getErrCodeDes() != null) {
-                    errorMsg.append("，错误详情：").append(getErrCodeDes());
-                }
-
-                this.getLogger().error("\n结果业务代码异常，返回结果：{},\n{}", map, errorMsg.toString());
-                throw new RuntimeException(errorMsg.toString());
-            }
         }
     }
 }
