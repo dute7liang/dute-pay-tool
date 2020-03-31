@@ -1,6 +1,8 @@
 package com.dute7liang.pay.tool.vx.service;
 
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import com.dute7liang.pay.tool.vx.core.notify.WxPayOrderNotifyResult;
+import com.dute7liang.pay.tool.vx.core.notify.WxPayRefundNotifyResult;
 import com.dute7liang.pay.tool.vx.core.result.WxPayOrderCloseResult;
 import com.dute7liang.pay.tool.vx.core.result.WxPayOrderQueryResult;
 import com.dute7liang.pay.tool.vx.core.result.WxPayRefundQueryResult;
@@ -81,6 +83,26 @@ public interface WxPayServiceI {
      */
     WxPayRefundQueryResult refundQuery(String transactionId, String outTradeNo, String outRefundNo, String refundId)
             throws WxPayException;
+
+    /**
+     * 解析支付结果通知.
+     * 详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7
+     *
+     * @param xmlData the xml data
+     * @return the wx pay order notify result
+     * @throws WxPayException the wx pay exception
+     */
+    WxPayOrderNotifyResult parseOrderNotifyResult(String xmlData) throws WxPayException;
+
+    /**
+     * 解析退款结果通知
+     * 详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_16&index=9
+     *
+     * @param xmlData the xml data
+     * @return the wx pay refund notify result
+     * @throws WxPayException the wx pay exception
+     */
+    WxPayRefundNotifyResult parseRefundNotifyResult(String xmlData) throws WxPayException;
 
     /**
      * 获取配置.

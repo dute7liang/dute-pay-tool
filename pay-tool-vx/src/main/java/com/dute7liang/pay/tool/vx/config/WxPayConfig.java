@@ -1,6 +1,7 @@
 package com.dute7liang.pay.tool.vx.config;
 
 
+import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,11 @@ public class WxPayConfig {
      * 证书密码
      */
     private String certPassword;
+
+    /**
+     * 签名方式
+     */
+    private String signType = WxConstant.SignType.MD5;
 
     /**
      * 返回所设置的微信支付接口请求地址域名.

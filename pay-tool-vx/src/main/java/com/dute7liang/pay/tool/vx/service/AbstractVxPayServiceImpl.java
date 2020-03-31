@@ -1,9 +1,12 @@
 package com.dute7liang.pay.tool.vx.service;
 
+import com.dute7liang.pay.tool.common.config.XmlConfig;
 import com.dute7liang.pay.tool.common.http.client.HttpClient;
 import com.dute7liang.pay.tool.common.http.response.SimpleResponse;
 import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import com.dute7liang.pay.tool.vx.core.notify.WxPayOrderNotifyResult;
+import com.dute7liang.pay.tool.vx.core.notify.WxPayRefundNotifyResult;
 import com.dute7liang.pay.tool.vx.core.result.*;
 import com.dute7liang.pay.tool.vx.core.trade.*;
 import com.dute7liang.pay.tool.vx.exception.WxPayException;
@@ -177,6 +180,39 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
         result.composeRefundRecords();
         result.checkResult();
         return result;
+    }
+
+    @Override
+    public WxPayOrderNotifyResult parseOrderNotifyResult(String xmlData) throws WxPayException {
+        try {
+            getLog().debug("微信支付异步通知请求参数：{}", xmlData);
+            WxPayOrderNotifyResult result = WxPayOrderNotifyResult.fromXML(xmlData,WxPayOrderNotifyResult.class);
+            getLog().debug("微信支付异步通知请求解析后的对象：{}", result);
+            result.checkResultAndSign(this, this.getConfig().getSignType());
+            return result;
+        } catch (WxPayException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new WxPayException("发生异常！", e);
+        }
+    }
+
+    @Override
+    public WxPayRefundNotifyResult parseRefundNotifyResult(String xmlData) throws WxPayException {
+        try {
+            getLog().debug("微信支付退款异步通知参数：{}", xmlData);
+            WxPayRefundNotifyResult result;
+            if (XmlConfig.fastMode) {
+                result = BaseWxPayResult.fromXML(xmlData, WxPayRefundNotifyResult.class);
+                result.decryptReqInfo(this.getConfig().getMchKey());
+            } else {
+                result = WxPayRefundNotifyResult.fromXML(xmlData, this.getConfig().getMchKey());
+            }
+            getLog().debug("微信支付退款异步通知解析后的对象：{}", result);
+            return result;
+        } catch (Exception e) {
+            throw new WxPayException("发生异常，" + e.getMessage(), e);
+        }
     }
 
 
