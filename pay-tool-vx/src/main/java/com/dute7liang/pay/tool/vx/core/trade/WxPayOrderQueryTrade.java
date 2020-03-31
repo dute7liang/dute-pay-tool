@@ -1,7 +1,6 @@
 package com.dute7liang.pay.tool.vx.core.trade;
 
 import com.dute7liang.pay.tool.vx.exception.WxPayException;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +64,6 @@ public class WxPayOrderQueryTrade extends WxBaseTrade {
    * 商户系统内部的订单号，当没提供transaction_id时需要传这个。
    * </pre>
    */
-  @XStreamAlias("out_trade_no")
   private String outTradeNo;
 
   @Override

@@ -1,6 +1,5 @@
 package com.dute7liang.pay.tool.vx.core.result;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +26,6 @@ public class WxPayRefundCouponInfo {
    * 描述：退款代金券ID, $n为下标，$m为下标，从0开始编号
    * </pre>
    */
-  @XStreamAlias("coupon_refund_id")
   private String couponRefundId;
 
   /**
@@ -40,7 +38,6 @@ public class WxPayRefundCouponInfo {
    * 描述：单个退款代金券支付金额, $n为下标，$m为下标，从0开始编号
    * </pre>
    */
-  @XStreamAlias("coupon_refund_fee")
   private Integer couponRefundFee;
 
   /**
@@ -55,7 +52,6 @@ public class WxPayRefundCouponInfo {
    * $n为下标,$m为下标,从0开始编号，举例：coupon_type_$0_$1
    * </pre>
    */
-  @XStreamAlias("coupon_type")
   private String couponType;
 
 }

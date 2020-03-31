@@ -1,7 +1,6 @@
 package com.dute7liang.pay.tool.vx.core.trade;
 
 import com.dute7liang.pay.tool.vx.exception.WxPayException;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,6 +1,5 @@
 package com.dute7liang.pay.tool.vx.core.result;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Builder;
 import lombok.Data;
 
