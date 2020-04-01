@@ -1,6 +1,7 @@
 package com.dute7liang.pay.tool.demo.web;
 
 import com.dute7liang.pay.tool.demo.response.Result;
+import com.dute7liang.pay.tool.demo.util.PayHttpUtil;
 import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.core.notify.WxPayNotifyResponse;
 import com.dute7liang.pay.tool.vx.core.notify.WxPayOrderNotifyResult;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 微信demo
@@ -33,13 +36,14 @@ public class TestController {
      * 创建订单
      */
     @GetMapping("unifiedorder")
-    public Result unifiedorder(){
+    public Result unifiedorder(HttpServletRequest request){
         WxUnifiedOrderTrade trade = WxUnifiedOrderTrade.newBuilder()
-                .tradeType(WxConstant.TradeType.APP)
+                .tradeType(WxConstant.TradeType.APP) // 支付类型
                 .body("主题")
-                .outTradeNo("V202009315678215642")
-                .totalFee(100)
-                .spbillCreateIp("192.168.72.36").build();
+                .outTradeNo("V202009315678215642") // 内部订单号
+                .totalFee(100) // 支付金额 分
+                .spbillCreateIp(PayHttpUtil.getRealClientIp(request)) // 客户端ip
+                .build();
 
         return Result.success(wxPayService.unifiedorder(trade));
     }
