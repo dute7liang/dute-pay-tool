@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * 微信支付的基本配置类
+ *
+ * author: zl
+ * Date: 2020/3/27
+ */
 @Getter
 @Setter
 public class WxPayConfig {

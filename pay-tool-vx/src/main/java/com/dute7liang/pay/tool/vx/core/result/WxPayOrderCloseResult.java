@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 import org.w3c.dom.Document;
 
 /**
- * <pre>
  * 关闭订单结果对象类
- * Created by Binary Wang on 2016-10-27.
- * </pre>
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * <br/>
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

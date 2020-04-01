@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <pre>
  *  退款代金券信息.
- *  Created by BinaryWang on 2018/4/21.
- * </pre>
  *
- * @author Binary Wang
+ * <br/>
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 @NoArgsConstructor

@@ -1,10 +1,9 @@
 package com.dute7liang.pay.tool.vx.service;
 
-import com.dute7liang.pay.tool.common.config.XmlConfig;
 import com.dute7liang.pay.tool.common.http.client.HttpClient;
 import com.dute7liang.pay.tool.common.http.response.SimpleResponse;
-import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.core.notify.WxPayOrderNotifyResult;
 import com.dute7liang.pay.tool.vx.core.notify.WxPayRefundNotifyResult;
 import com.dute7liang.pay.tool.vx.core.result.*;
@@ -52,7 +51,7 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
         String responseBody = post(url, trade.toXML(), false);
         // 解析响应数据
         WxPayUnifiedOrderResult result = BaseWxPayResult.fromXML(responseBody, WxPayUnifiedOrderResult.class);
-        result.checkResult();
+        result.checkResult(this,trade.getSignType());
         String prepayId = result.getPrepayId();
         if (StringUtils.isBlank(prepayId)) {
             throw new WxPayException(String.format("无法获取prepay id，错误代码： '%s'，信息：%s。",
@@ -127,30 +126,30 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
 
         WxPayOrderQueryResult result = BaseWxPayResult.fromXML(responseContent, WxPayOrderQueryResult.class);
         result.composeCoupons();
-        result.checkResult();
+        result.checkResult(this,trade.getSignType());
         return result;
     }
 
     @Override
-    public WxPayOrderCloseResult closeOrder(String outTradeNo) throws WxPayException {
+    public WxPayOrderCloseResult closeOrder(String outTradeNo) {
         if (StringUtils.isBlank(outTradeNo)) {
             throw new WxPayException("out_trade_no不能为空");
         }
 
-        WxPayOrderCloseTrade request = new WxPayOrderCloseTrade();
-        request.setOutTradeNo(StringUtils.trimToNull(outTradeNo));
+        WxPayOrderCloseTrade trade = new WxPayOrderCloseTrade();
+        trade.setOutTradeNo(StringUtils.trimToNull(outTradeNo));
 
-        request.checkAndSign(this.getConfig());
+        trade.checkAndSign(this.getConfig());
 
         String url = this.getConfig().getPayBaseUrl() + "/pay/closeorder";
-        String responseContent = this.post(url, request.toXML(), false);
+        String responseContent = this.post(url, trade.toXML(), false);
         WxPayOrderCloseResult result = BaseWxPayResult.fromXML(responseContent, WxPayOrderCloseResult.class);
-        result.checkResult();
+        result.checkResult(this,trade.getSignType());
         return result;
     }
 
     @Override
-    public WxPayRefundResult refund(WxPayRefundTrade trade) throws WxPayException {
+    public WxPayRefundResult refund(WxPayRefundTrade trade) {
         trade.checkAndSign(this.getConfig());
 
         String url = this.getConfig().getPayBaseUrl() + "/secapi/pay/refund";
@@ -161,24 +160,25 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
         String responseContent = this.post(url, trade.toXML(), true);
         WxPayRefundResult result = BaseWxPayResult.fromXML(responseContent, WxPayRefundResult.class);
         result.composeRefundCoupons();
-        result.checkResult();
+        result.checkResult(this,trade.getSignType());
         return result;
     }
 
     @Override
-    public WxPayRefundQueryResult refundQuery(String transactionId, String outTradeNo, String outRefundNo, String refundId) throws WxPayException {
-        WxPayRefundQueryTrade request = new WxPayRefundQueryTrade();
-        request.setOutTradeNo(StringUtils.trimToNull(outTradeNo));
-        request.setTransactionId(StringUtils.trimToNull(transactionId));
-        request.setOutRefundNo(StringUtils.trimToNull(outRefundNo));
-        request.setRefundId(StringUtils.trimToNull(refundId));
+    public WxPayRefundQueryResult refundQuery(String transactionId, String outTradeNo, String outRefundNo, String refundId) {
+        WxPayRefundQueryTrade trade = new WxPayRefundQueryTrade();
+        trade.setOutTradeNo(StringUtils.trimToNull(outTradeNo));
+        trade.setTransactionId(StringUtils.trimToNull(transactionId));
+        trade.setOutRefundNo(StringUtils.trimToNull(outRefundNo));
+        trade.setRefundId(StringUtils.trimToNull(refundId));
 
-        request.checkAndSign(this.getConfig());
+        trade.checkAndSign(this.getConfig());
+
         String url = this.getConfig().getPayBaseUrl() + "/pay/refundquery";
-        String responseContent = this.post(url, request.toXML(), false);
+        String responseContent = this.post(url, trade.toXML(), false);
         WxPayRefundQueryResult result = BaseWxPayResult.fromXML(responseContent, WxPayRefundQueryResult.class);
         result.composeRefundRecords();
-        result.checkResult();
+        result.checkResult(this,trade.getSignType());
         return result;
     }
 
@@ -188,7 +188,7 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
             getLog().debug("微信支付异步通知请求参数：{}", xmlData);
             WxPayOrderNotifyResult result = WxPayOrderNotifyResult.fromXML(xmlData,WxPayOrderNotifyResult.class);
             getLog().debug("微信支付异步通知请求解析后的对象：{}", result);
-            result.checkResultAndSign(this, this.getConfig().getSignType());
+            result.checkResult(this, result.getSignType());
             return result;
         } catch (WxPayException e) {
             throw e;
@@ -201,13 +201,8 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
     public WxPayRefundNotifyResult parseRefundNotifyResult(String xmlData) throws WxPayException {
         try {
             getLog().debug("微信支付退款异步通知参数：{}", xmlData);
-            WxPayRefundNotifyResult result;
-            if (XmlConfig.fastMode) {
-                result = BaseWxPayResult.fromXML(xmlData, WxPayRefundNotifyResult.class);
-                result.decryptReqInfo(this.getConfig().getMchKey());
-            } else {
-                result = WxPayRefundNotifyResult.fromXML(xmlData, this.getConfig().getMchKey());
-            }
+            WxPayRefundNotifyResult result = BaseWxPayResult.fromXML(xmlData, WxPayRefundNotifyResult.class);
+            result.decryptReqInfo(this.getConfig().getMchKey());
             getLog().debug("微信支付退款异步通知解析后的对象：{}", result);
             return result;
         } catch (Exception e) {

@@ -11,7 +11,9 @@ import java.util.Map;
  * Created by Binary Wang on 2016-11-24.
  * </pre>
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * <br/>
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -84,7 +86,6 @@ public class WxPayRefundQueryTrade extends WxBaseTrade {
         && StringUtils.isNotBlank(outRefundNo) && StringUtils.isNotBlank(refundId))) {
       throw new WxPayException("transaction_id，out_trade_no，out_refund_no，refund_id 必须四选一");
     }
-
   }
 
   @Override

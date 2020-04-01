@@ -13,10 +13,11 @@ import java.util.Map;
 /**
  * <pre>
  * 微信支付-申请退款请求参数
- * Created by Binary Wang on 2016-10-08.
  * </pre>
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * <br/>
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

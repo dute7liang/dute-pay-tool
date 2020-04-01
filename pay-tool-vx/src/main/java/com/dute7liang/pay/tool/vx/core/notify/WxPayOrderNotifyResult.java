@@ -6,6 +6,7 @@ import com.dute7liang.pay.tool.vx.exception.WxPayException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import java.util.List;
  * 文档见：https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7&index=8
  * https://pay.weixin.qq.com/wiki/doc/api/external/native.php?chapter=9_7
  *
- * @author aimilin6688
- * @since 2.5.0
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -293,18 +294,6 @@ public class WxPayOrderNotifyResult extends BaseWxPayResult {
         super.checkResult();
     }
 
- /* @Override
-  public Map<String, String> toMap() {
-    Map<String, String> resultMap = SignUtils.xmlBean2Map(this);
-    if (this.getCouponCount() != null && this.getCouponCount() > 0) {
-      for (int i = 0; i < this.getCouponCount(); i++) {
-        WxPayOrderNotifyCoupon coupon = couponList.get(i);
-        resultMap.putAll(coupon.toMap(i));
-      }
-    }
-    return resultMap;
-  }*/
-
     @Override
     protected void loadXML(Document d) {
         promotionDetail = readXMLString(d, "promotion_detail");
@@ -329,6 +318,9 @@ public class WxPayOrderNotifyResult extends BaseWxPayResult {
         version = readXMLString(d, "version");
         rateValue = readXMLString(d, "rate_value");
         signType = readXMLString(d, "sign_type");
+        if(StringUtils.isBlank(signType)){ // signType 没有给 默认是MD5，签名校验的需要
+            signType = WxConstant.SignType.MD5;
+        }
 
         composeCoupons();
     }
@@ -340,7 +332,7 @@ public class WxPayOrderNotifyResult extends BaseWxPayResult {
         if (this.couponCount == null || this.couponCount == 0) {
             return;
         }
-        this.couponList = new ArrayList(couponCount);
+        this.couponList = new ArrayList();
         for (int i = 0; i < this.couponCount; i++) {
             WxPayOrderNotifyCoupon coupon = new WxPayOrderNotifyCoupon();
             coupon.setCouponId(this.getXmlValue("xml/coupon_id_" + i));

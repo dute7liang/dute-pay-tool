@@ -1,7 +1,6 @@
 package com.dute7liang.pay.tool.vx.core.trade;
 
 import com.dute7liang.pay.tool.common.util.PayMD5;
-import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
 import com.dute7liang.pay.tool.vx.util.SignUtils;
 import lombok.Getter;
@@ -162,7 +161,7 @@ public abstract class WxBaseTrade implements Serializable {
             this.setMchId(config.getMchId());
         }
         if (StringUtils.isBlank(getSignType())) {
-            this.setSignType(WxConstant.SignType.MD5);
+            this.setSignType(config.getSignType());
         }
         if (StringUtils.isBlank(getNonceStr())) {
             this.setNonceStr(PayMD5.encode(UUID.randomUUID().toString()));

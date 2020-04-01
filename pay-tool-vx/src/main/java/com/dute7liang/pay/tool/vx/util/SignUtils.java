@@ -56,8 +56,7 @@ public class SignUtils {
         }
         toSign.append("key=").append(signKey);
         if (WxConstant.SignType.HMAC_SHA256.equals(signType)) {
-//      return me.chanjar.weixin.common.util.SignUtils.createHmacSha256Sign(toSign.toString(), signKey);
-            throw new RuntimeException("暂时只支持MD5签名方式！");
+            return com.dute7liang.pay.tool.common.util.SignUtils.createHmacSha256Sign(toSign.toString(), signKey);
         } else {
             return DigestUtils.md5Hex(toSign.toString()).toUpperCase();
         }

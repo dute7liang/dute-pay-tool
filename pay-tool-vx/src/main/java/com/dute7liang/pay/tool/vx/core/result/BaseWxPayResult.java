@@ -26,6 +26,9 @@ import java.util.Map;
 
 /**
  * 微信支付结果共用属性类.
+ *
+ * author: zl
+ * Date: 2020/4/1
  */
 @Data
 public abstract class BaseWxPayResult implements Serializable {
@@ -277,24 +280,23 @@ public abstract class BaseWxPayResult implements Serializable {
         }
     }
 
-    /**
-     * 校验返回结果和签名
-     * @param wxPayService
-     * @param signType
-     */
-    public void checkResultAndSign(WxPayServiceI wxPayService, String signType){
-        checkResult();
-        checkSign(wxPayService,signType);
+    public void checkResult(){
+
     }
 
     /**
-     * 校验返回结果
+     * 校验返回结果和签名
      *
      * @throws RuntimeException the wx pay exception
      */
-    public void checkResult() throws RuntimeException {
-        //校验结果是否成功
+    public void checkResult(WxPayServiceI wxPayService, String signType) throws RuntimeException {
+        //校验返回结果签名
         Map<String, String> map = toMap();
+        if (getSign() != null && !SignUtils.checkSign(map, signType, wxPayService.getConfig().getMchKey())) {
+            this.getLogger().debug("校验结果签名失败，参数：{}", map);
+            throw new RuntimeException("参数签名校验错误！");
+        }
+        //校验结果是否成功
         List<String> successStrings = Arrays.asList(WxConstant.ResultCode.SUCCESS, "");
         if (!successStrings.contains(StringUtils.trimToEmpty(getReturnCode()).toUpperCase())
                 || !successStrings.contains(StringUtils.trimToEmpty(getResultCode()).toUpperCase())) {
@@ -319,17 +321,4 @@ public abstract class BaseWxPayResult implements Serializable {
         }
     }
 
-    /**
-     * 校验签名的正确性
-     *
-     * @throws RuntimeException the wx pay exception
-     */
-    public void checkSign(WxPayServiceI wxPayService, String signType){
-        //校验返回结果签名
-        Map<String, String> map = toMap();
-        if (getSign() != null && !SignUtils.checkSign(map, signType, wxPayService.getConfig().getMchKey())) {
-            this.getLogger().debug("校验结果签名失败，参数：{}", map);
-            throw new RuntimeException("参数格式校验错误！");
-        }
-    }
 }
