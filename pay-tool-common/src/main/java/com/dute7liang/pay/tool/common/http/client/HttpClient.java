@@ -55,17 +55,14 @@ public class HttpClient extends AbstractHttpClient {
                         custom().
                         setDefaultRequestConfig(globalConfig).
                         setDefaultCookieStore(cookieStore).
-                        setRetryHandler(new HttpRequestRetryHandler() {
-                            @Override
-                            public boolean retryRequest(IOException exception, int retryTimes, HttpContext httpContext) {
-                                if(retryTimes > 10){  //最多重试10次
-                                    return false;
-                                }
-                                if(Arrays.asList(InterruptedIOException.class, UnknownHostException.class, ConnectException.class, SSLException.class).contains(exception.getClass())){  //此类异常不进行重试
-                                    return false;
-                                }
-                                return true;  //重点是这，非幂等的post请求也进行重试
+                        setRetryHandler((exception, retryTimes, httpContext) -> {
+                            if(retryTimes > 10){  //最多重试10次
+                                return false;
                             }
+                            if(Arrays.asList(InterruptedIOException.class, UnknownHostException.class, ConnectException.class, SSLException.class).contains(exception.getClass())){  //此类异常不进行重试
+                                return false;
+                            }
+                            return true;  //重点是这，非幂等的post请求也进行重试
                         }).
                         build();
     }

@@ -9,7 +9,9 @@ import com.dute7liang.pay.tool.vx.core.notify.WxPayRefundNotifyResult;
 import com.dute7liang.pay.tool.vx.core.result.*;
 import com.dute7liang.pay.tool.vx.core.trade.*;
 import com.dute7liang.pay.tool.vx.exception.WxPayException;
+import com.dute7liang.pay.tool.vx.http.HttpsWxClient;
 import com.dute7liang.pay.tool.vx.util.SignUtils;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class AbstractVxPayServiceImpl implements WxPayServiceI {
 
     @Setter
+    @Getter
     protected WxPayConfig wxPayConfig;
 
     @Override
@@ -212,7 +215,12 @@ public class AbstractVxPayServiceImpl implements WxPayServiceI {
 
 
     public String post(String url,String requestStr,boolean userKey){
-        SimpleResponse response = HttpClient.getClient().post(url, requestStr);
+        SimpleResponse response;
+        if(userKey){
+            response = HttpsWxClient.getInstance(this.wxPayConfig).post(url, requestStr);
+        }else{
+            response = HttpClient.getClient().post(url, requestStr);
+        }
         if(response.getCode() != 200){
             throw new RuntimeException("请求预支付通信失败, HTTP STATUS[" + response.getCode() + "]");
         }

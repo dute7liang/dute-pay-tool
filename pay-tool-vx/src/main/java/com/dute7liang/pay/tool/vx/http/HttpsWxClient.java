@@ -2,11 +2,13 @@ package com.dute7liang.pay.tool.vx.http;
 
 import com.dute7liang.pay.tool.common.http.client.common.AbstractSSLHttpClient;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import com.sun.security.ntlm.Client;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContexts;
+import sun.security.jca.GetInstance;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -22,13 +24,28 @@ import java.security.KeyStore;
  */
 public class HttpsWxClient extends AbstractSSLHttpClient {
     
-    private static final HttpsWxClient CLIENT = new HttpsWxClient();
-
-    @Getter
-    @Setter
-    private WxPayConfig config;
+    private static transient HttpsWxClient CLIENT = null;
 
     private HttpsWxClient(){}
+
+    @Setter
+    @Getter
+    private WxPayConfig config;
+
+    public static HttpsWxClient getInstance(WxPayConfig config){
+        if(CLIENT != null){
+            return CLIENT;
+        }
+        synchronized (HttpsWxClient.class){
+            if(CLIENT != null){
+                return CLIENT;
+            }
+            CLIENT = new HttpsWxClient();
+            CLIENT.setConfig(config);
+            return CLIENT;
+        }
+    }
+
     
     @Override
     protected SSLConnectionSocketFactory getSSLSocketFactory() {
@@ -66,9 +83,5 @@ public class HttpsWxClient extends AbstractSSLHttpClient {
                 }
             }
         }
-    }
-    
-    public static HttpsWxClient getClient(){
-        return CLIENT;
     }
 }
