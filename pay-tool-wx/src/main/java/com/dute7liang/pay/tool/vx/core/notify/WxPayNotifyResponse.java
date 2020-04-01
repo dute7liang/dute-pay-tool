@@ -12,15 +12,9 @@ import org.dom4j.Element;
  *
  * @author someone
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class WxPayNotifyResponse {
     private static final String FAIL = "FAIL";
     private static final String SUCCESS = "SUCCESS";
-
-//    private String returnCode;
-//    private String returnMsg;
 
     /**
      * Fail string.
