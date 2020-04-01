@@ -2,13 +2,11 @@ package com.dute7liang.pay.tool.vx.http;
 
 import com.dute7liang.pay.tool.common.http.client.common.AbstractSSLHttpClient;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
-import com.sun.security.ntlm.Client;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContexts;
-import sun.security.jca.GetInstance;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;

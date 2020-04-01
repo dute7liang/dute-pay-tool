@@ -1,0 +1,7 @@
+duteliang:
+  wx:
+    pay:
+      app-id: wx8b5873b12a0d15cb
+      mch-id: 1567555201
+      mch-key: jianqingmaiwangluokejiyxgs591591
+      notify-url: http://dute7liang.com/pay/wxNotify

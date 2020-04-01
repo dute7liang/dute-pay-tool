@@ -8,10 +8,11 @@
     <artifactId>pay-tool</artifactId>
     <version>1.0-RELEASE</version>
     <modules>
-        <module>pay-tool-vx</module>
+        <module>pay-tool-wx</module>
         <module>pay-tool-ali</module>
         <module>pay-tool-common</module>
         <module>pay-tool-demo</module>
+        <module>spring-boot-starter</module>
     </modules>
     <packaging>pom</packaging>
 
