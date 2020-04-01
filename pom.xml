@@ -7,6 +7,49 @@
     <groupId>com.dute7liang</groupId>
     <artifactId>pay-tool</artifactId>
     <version>1.0-RELEASE</version>
+
+    <packaging>pom</packaging>
+
+    <name>com.dute7liang:pay-tool</name>
+    <description>开箱即用的微信和支付宝的支付工具</description>
+    <url>https://github.com/dute7liang/dute-pay-tool</url>
+
+    <!-- 许可证信息 -->
+    <licenses>
+        <!-- Apache许可证 -->
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <!-- SCM信息 -> git在github上托管 -->
+    <scm>
+        <connection>scm:git:https://github.com/dute7liang/dute-pay-tool.git</connection>
+        <developerConnection>scm:git:git@github.com:dute7liang/dute-pay-tool.git</developerConnection>
+        <url>https://github.com/dute7liang/dute-pay-tool</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>dute7liang</name>
+            <email>383200134@qq.com</email>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+
+
     <modules>
         <module>pay-tool-wx</module>
         <module>pay-tool-ali</module>
@@ -14,7 +57,6 @@
         <module>pay-tool-demo</module>
         <module>spring-boot-starter</module>
     </modules>
-    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -93,6 +135,81 @@
         </dependencies>
 
     </dependencyManagement>
+
+
+
+    <profiles>
+        <!--<profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+            </properties>
+        </profile>-->
+
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+<!--                            <additionalparam>${javadoc.opts}</additionalparam>-->
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <charset>UTF-8</charset>
+                            <locale>zh_CN</locale>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--<profile>
+            <id>native-image</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>-->
+    </profiles>
 
 
 </project>

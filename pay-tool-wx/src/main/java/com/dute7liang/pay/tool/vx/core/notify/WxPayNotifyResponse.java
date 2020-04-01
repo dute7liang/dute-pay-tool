@@ -16,8 +16,8 @@ import org.dom4j.Element;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WxPayNotifyResponse {
-    private static final transient String FAIL = "FAIL";
-    private static final transient String SUCCESS = "SUCCESS";
+    private static final String FAIL = "FAIL";
+    private static final String SUCCESS = "SUCCESS";
 
 //    private String returnCode;
 //    private String returnMsg;
