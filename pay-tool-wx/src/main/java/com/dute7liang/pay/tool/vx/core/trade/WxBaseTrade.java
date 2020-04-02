@@ -2,6 +2,7 @@ package com.dute7liang.pay.tool.vx.core.trade;
 
 import com.dute7liang.pay.tool.common.util.PayMD5;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
+import com.dute7liang.pay.tool.vx.exception.WxPayException;
 import com.dute7liang.pay.tool.vx.util.SignUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.dute7liang.pay.tool.vx.constant.WxConstant.SignType.ALL_SIGN_TYPES;
 
 /**
  * <br/>
@@ -161,7 +164,14 @@ public abstract class WxBaseTrade implements Serializable {
             this.setMchId(config.getMchId());
         }
         if (StringUtils.isBlank(getSignType())) {
-            this.setSignType(config.getSignType());
+            if (config.getSignType() != null && !ALL_SIGN_TYPES.contains(config.getSignType())) {
+                throw new WxPayException("非法的signType配置：" + config.getSignType() + "，请检查配置！");
+            }
+            this.setSignType(StringUtils.trimToNull(config.getSignType()));
+        } else {
+            if (!ALL_SIGN_TYPES.contains(this.getSignType())) {
+                throw new WxPayException("非法的sign_type参数：" + this.getSignType());
+            }
         }
         if (StringUtils.isBlank(getNonceStr())) {
             this.setNonceStr(PayMD5.encode(UUID.randomUUID().toString()));
