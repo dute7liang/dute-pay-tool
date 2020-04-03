@@ -19,6 +19,7 @@ public class WxPayConfig {
     private static final String DEFAULT_PAY_BASE_URL = "https://api.mch.weixin.qq.com";
 
     /**
+     * 故意修改点东西
      * 微信支付接口请求地址域名部分.
      */
     private String payBaseUrl = DEFAULT_PAY_BASE_URL;
