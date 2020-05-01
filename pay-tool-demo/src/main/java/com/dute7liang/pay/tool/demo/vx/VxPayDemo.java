@@ -1,6 +1,7 @@
 package com.dute7liang.pay.tool.demo.vx;
 
 
+import com.alibaba.fastjson.JSON;
 import com.dute7liang.pay.tool.vx.config.WxPayConfig;
 import com.dute7liang.pay.tool.vx.constant.WxConstant;
 import com.dute7liang.pay.tool.vx.core.notify.WxPayOrderNotifyResult;
@@ -18,18 +19,19 @@ public class VxPayDemo {
 
     public static void main(String[] args) {
 //        wxPay();
-//        queryOrder();
+        queryOrder();
+
 //        closeOrder();
 //        refund();
 //        refundQuery();
-        parseOrderNotifyResult();
+//        parseOrderNotifyResult();
     }
 
     public static WxPayServiceI init(){
         WxPayConfig config = new WxPayConfig();
         config.setAppid("wx8b5873b12a0d15cb");
         config.setMchId("1567555201");
-        config.setMchKey("jianqingmaiwangluokejiyxgs591591");
+        config.setMchKey("");
         config.setNotifyURL("http://dute7liang.com/pay/wxNotify");
 //        config.setCertPath();
 //        config.setCertPassword();
@@ -41,8 +43,8 @@ public class VxPayDemo {
 
     public static void queryOrder(){
         WxPayServiceI wxPayService = init();
-        WxPayOrderQueryResult result = wxPayService.queryOrder(null, "V202009315678215623");
-        System.out.println(result);
+        WxPayOrderQueryResult result = wxPayService.queryOrder(null, "L202005020017166998481");
+        System.out.println(JSON.toJSONString(result));
     }
 
     /**
